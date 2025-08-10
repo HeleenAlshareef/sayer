@@ -1,59 +1,58 @@
 class Showroom {
   final String name;
   final String logoPath;
-  final String description;
+  final String city;
+  final String brand;
+  final String featuredBrand;
+  final String phone;
 
   Showroom({
     required this.name,
     required this.logoPath,
-    required this.description,
+    required this.city,
+    required this.brand,
+    required this.featuredBrand,
+    required this.phone,
   });
+
+  String get description =>
+      'اسم المعرض: $name\n'
+      'العلامة التجارية المميزة: $featuredBrand\n'
+      'رقم التواصل: $phone\n'
+      'المدينة: $city';
 }
 
 final List<Showroom> showroomList = [
   Showroom(
-    name: 'CHERY',
-    logoPath: 'assets/showrooms/chery.PNG',
-    description: 'شركة شيري',
+    name: 'عبد اللطيف جميل',
+    logoPath: 'assets/showrooms/5.png',
+    city: 'جدة',
+    brand: 'تويوتا',
+    featuredBrand: 'تويوتا',
+    phone: '920002727',
   ),
   Showroom(
-    name: 'Jeep',
-    logoPath: 'assets/showrooms/jeep.PNG',
-    description: 'شركة جيب',
+    name: 'الناغي',
+    logoPath: 'assets/showrooms/3.png',
+    city: 'الرياض',
+    brand: 'هيونداي',
+    featuredBrand: 'هيونداي',
+    phone: '920015599',
   ),
   Showroom(
-    name: 'HYUNDAI',
-    logoPath: 'assets/showrooms/hyundai.PNG',
-    description: 'شركة هونداي',
+    name: 'الجميح',
+    logoPath: 'assets/showrooms/4.png',
+    city: 'الدمام',
+    brand: 'شفروليه',
+    featuredBrand: 'شفروليه',
+    phone: '8002442244',
   ),
   Showroom(
-    name: 'CHEVROLET',
-    logoPath: 'assets/showrooms/chevrolet.PNG',
-    description: 'شركة شفروليه',
-  ),
-  Showroom(
-    name: 'KIA',
-    logoPath: 'assets/showrooms/kia.PNG',
-    description: 'شركة كيا',
-  ),
-  Showroom(
-    name: 'MGC',
-    logoPath: 'assets/showrooms/gmc.PNG',
-    description: 'شركة جي ام سي',
-  ),
-  Showroom(
-    name: 'FORD',
-    logoPath: 'assets/showrooms/ford.PNG',
-    description: 'شركة فورد',
-  ),
-  Showroom(
-    name: 'LEXUS',
-    logoPath: 'assets/showrooms/lexus.PNG',
-    description: 'شركة ليكزس',
-  ),
-  Showroom(
-    name: 'TOYOTA',
-    logoPath: 'assets/showrooms/toyota.PNG',
-    description: 'شركة تيوتا',
+    name: 'المجدوعي',
+    logoPath: 'assets/showrooms/2.png',
+    city: 'الخبر',
+    brand: 'شانجان',
+    featuredBrand: 'شانجان',
+    phone: '920015999',
   ),
 ];
