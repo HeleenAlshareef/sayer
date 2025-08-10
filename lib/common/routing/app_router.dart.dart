@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sayer/common/routing/routes.dart';
+import 'package:sayer/features/orders/ui/orders_screen.dart';
 import 'package:sayer/features/showroomlist/ui/showrooms_list_screen.dart.dart';
 import 'package:sayer/features/showroom/ui/showroom_screen.dart';
 
@@ -11,6 +12,9 @@ class AppRouter {
 
       case Routes.showroomList:
         return MaterialPageRoute(builder: (_) => ShowroomsListScreen());
+
+      case Routes.orders:
+        return MaterialPageRoute(builder: (_) => OrdersScreen());
 
       default:
         return MaterialPageRoute(

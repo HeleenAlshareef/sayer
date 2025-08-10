@@ -1,22 +1,49 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:sayer/common/theme/colors.dart';
-import 'package:sayer/features/showroomlist/ui/widget/lists.dart';
-import 'package:sayer/features/showroomlist/ui/widget/search..dart';
+import 'package:sayer/features/showroomlist/ui/widget/filter.dart';
+import 'package:sayer/features/showroomlist/ui/widget/lists.dart'; // لو غيّرته إلى list.dart عدّل هنا
+import 'package:sayer/features/showroomlist/ui/widget/search.dart';
 
 class ShowroomsListScreen extends StatefulWidget {
   const ShowroomsListScreen({super.key});
 
   @override
-  State<ShowroomsListScreen> createState() => _ShowroomsListScreenState();
+  State<ShowroomsListScreen> createState() => ShowroomsListScreenState();
 }
 
-class _ShowroomsListScreenState extends State<ShowroomsListScreen> {
+class ShowroomsListScreenState extends State<ShowroomsListScreen> {
   final TextEditingController searchController = TextEditingController();
+  final FocusNode searchFocus = FocusNode();
+  bool showSearch = false;
 
-  void _onSearchChanged(String value) {
-    print("بحث: $value");
-    // filter
+  final List<String?> cities = ['الرياض', 'جدة', 'الخبر'];
+  final List<String?> brands = ['تويوتا', 'هيونداي', 'مرسيدس'];
+  final List<String?> featuredBrands = ['تويوتا', 'هيونداي', 'مرسيدس'];
+
+  String? selectedCity;
+  String? selectedBrand;
+  String? selectedFeaturedBrand;
+
+  void SearchChanged(String value) => setState(() {});
+
+  @override
+  void dispose() {
+    searchController.dispose();
+    searchFocus.dispose();
+    super.dispose();
+  }
+
+  void toggleSearch() {
+    setState(() => showSearch = !showSearch);
+    if (showSearch) {
+      Future.delayed(const Duration(milliseconds: 100), () {
+        if (mounted) FocusScope.of(context).requestFocus(searchFocus);
+      });
+    } else {
+      searchController.clear();
+      SearchChanged('');
+    }
   }
 
   @override
@@ -25,7 +52,7 @@ class _ShowroomsListScreenState extends State<ShowroomsListScreen> {
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topCenter,
-          end: Alignment(0.0, -0.2),
+          end: const Alignment(0.0, -0.2),
           colors: [AppColors.gradientStart, AppColors.gradientend],
         ),
       ),
@@ -33,45 +60,82 @@ class _ShowroomsListScreenState extends State<ShowroomsListScreen> {
         backgroundColor: Colors.transparent,
         body: SafeArea(
           child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 30.h),
+            padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 24.h),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                IconButton(
-                  icon: const Icon(Icons.arrow_back_ios, color: Colors.black),
-                  onPressed: () => Navigator.pop(context),
+                Row(
+                  children: [
+                    IconButton(
+                      icon: const Icon(
+                        Icons.arrow_back_ios,
+                        color: AppColors.darkerGrey,
+                      ),
+                      onPressed: () => Navigator.pop(context),
+                    ),
+                    Expanded(
+                      child: Text(
+                        'المعارض',
+                        textAlign: TextAlign.center,
+                        style: Theme.of(
+                          context,
+                        ).textTheme.titleMedium?.copyWith(
+                          color: AppColors.darkerGrey,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16.sp,
+                        ),
+                      ),
+                    ),
+                    IconButton(
+                      icon: Icon(
+                        showSearch ? Icons.close : Icons.search,
+                        color: AppColors.darkerGrey,
+                      ),
+                      onPressed: toggleSearch,
+                    ),
+                  ],
                 ),
-                SizedBox(height: 10.h),
 
-                Center(
-                  child: Image.asset(
-                    'assets/images/logo.png',
-                    width: 50.w,
-                    height: 50.h,
-                    fit: BoxFit.contain,
-                  ),
-                ),
-                SizedBox(height: 20.h),
-
-                ShowroomSearchBar(
-                  controller: searchController,
-                  onChanged: _onSearchChanged,
-                ),
-
-                SizedBox(height: 30.h),
-
-                Center(
-                  child: Text(
-                    "قائمة المعارض",
-                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                      color: AppColors.darkerGrey,
-                      fontWeight: FontWeight.bold,
+                AnimatedCrossFade(
+                  duration: const Duration(milliseconds: 200),
+                  crossFadeState:
+                      showSearch
+                          ? CrossFadeState.showFirst
+                          : CrossFadeState.showSecond,
+                  firstChild: Padding(
+                    padding: EdgeInsets.only(top: 16.h),
+                    child: ShowroomSearchBar(
+                      controller: searchController,
+                      focusNode: searchFocus,
+                      onChanged: SearchChanged,
                     ),
                   ),
+                  secondChild: SizedBox(height: 8.h),
                 ),
 
-                SizedBox(height: 20.h),
-                Expanded(child: ShowroomGrid()),
+                SizedBox(height: 12.h),
+
+                FilterWidget(
+                  cities: cities,
+                  brands: brands,
+                  featuredBrands: featuredBrands,
+                  selectedCity: selectedCity,
+                  selectedBrand: selectedBrand,
+                  selectedFeaturedBrand: selectedFeaturedBrand,
+                  onCityChanged: (v) => setState(() => selectedCity = v),
+                  onBrandChanged: (v) => setState(() => selectedBrand = v),
+                  onFeaturedBrandChanged:
+                      (v) => setState(() => selectedFeaturedBrand = v),
+                ),
+
+                SizedBox(height: 12.h),
+                Expanded(
+                  child: ShowroomGrid(
+                    city: selectedCity,
+                    brand: selectedBrand,
+                    featuredBrand: selectedFeaturedBrand,
+                    query: searchController.text.trim(),
+                  ),
+                ),
               ],
             ),
           ),
