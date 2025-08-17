@@ -1,89 +1,49 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:sayer/common/theme/colors.dart';
-import 'package:sayer/common/widgets/app_bar.dart';
-import 'package:sayer/common/routing/routes.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:sayer/features/showroom/ui/widget/showroom_form.dart';
-import 'package:sayer/common/helpers/bar.dart';
-import 'package:sayer/features/showroomlist/ui/widget/details.dart';
 
-class ShowroomScreen extends StatefulWidget {
+class ShowroomScreen extends StatelessWidget {
   const ShowroomScreen({super.key});
 
   @override
-  State<ShowroomScreen> createState() => _ShowroomScreenState();
-}
-
-class _ShowroomScreenState extends State<ShowroomScreen> {
-  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-
-  @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () => FocusScope.of(context).unfocus(),
-      child: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: const Alignment(0.0, -0.2),
-            colors: [AppColors.gradientStart, AppColors.gradientend],
-          ),
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment(0.0, -0.2),
+          colors: [AppColors.gradientStart, AppColors.gradientend],
         ),
-        child: Scaffold(
-          key: _scaffoldKey,
-          backgroundColor: Colors.transparent,
-          bottomNavigationBar: AppBottomNav(
-            currentIndex: 0,
-            onTap: (i) => handleBottomTap(context, 0, i),
-          ),
-          body: SafeArea(
-            child: SingleChildScrollView(
-              padding: EdgeInsets.symmetric(horizontal: 20.w),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  SizedBox(height: 40.h),
-                  Image.asset(
-                    'assets/images/logo.png',
+      ),
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        body: SafeArea(
+          child: SingleChildScrollView(
+            padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 40.h),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Center(
+                  child: SizedBox(
                     width: 120,
                     height: 120,
+                    child: Image.asset('assets/images/logo.png'),
                   ),
-                  SizedBox(height: 30.h),
-                  Text(
+                ),
+                SizedBox(height: 30.h),
+                Center(
+                  child: Text(
                     "قم بإدخال بيانات المعرض",
                     style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                       color: AppColors.darkerGrey,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  SizedBox(height: 40.h),
-                  ShowroomForm(
-                    onSubmit: (name, phone, city, brands, featured, location) {
-                      if (name.isEmpty ||
-                          phone.isEmpty ||
-                          city.isEmpty ||
-                          brands.isEmpty ||
-                          featured.isEmpty ||
-                          location.isEmpty) {
-                        return;
-                      }
-
-                      showroomList.add(
-                        Showroom(
-                          name: name,
-                          phone: phone,
-                          city: city,
-                          brand: brands.join(', '),
-                          featuredBrand: featured,
-                          logoPath: '',
-                        ),
-                      );
-
-                      Navigator.pushNamed(context, Routes.showroomList);
-                    },
-                  ),
-                ],
-              ),
+                ),
+                SizedBox(height: 40.h),
+                ShowroomForm(),
+              ],
             ),
           ),
         ),

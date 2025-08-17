@@ -1,35 +1,23 @@
 import 'package:flutter/material.dart';
-import 'package:sayer/common/theme/colors.dart';
+import 'package:sayer/common/routing/routes.dart';
+import 'package:sayer/common/widgets/app_button.dart';
 import 'package:sayer/common/widgets/text_field.dart';
 import 'package:sayer/features/showroom/ui/widget/dropdown_field.dart';
 import 'package:sayer/features/showroom/ui/widget/multi_select.dart';
-import 'package:sayer/common/widgets/app_button.dart';
+import 'package:sayer/common/helpers/extensions.dart';
 
 class ShowroomForm extends StatefulWidget {
-  final void Function(
-    String name,
-    String phone,
-    String city,
-    List<String> brands,
-    String featuredBrand,
-    String location,
-  )
-  onSubmit;
-
-  const ShowroomForm({super.key, required this.onSubmit});
+  const ShowroomForm({super.key});
 
   @override
   State<ShowroomForm> createState() => _ShowroomFormState();
 }
 
 class _ShowroomFormState extends State<ShowroomForm> {
-  final nameController = TextEditingController();
-  final phoneController = TextEditingController();
-  final locationController = TextEditingController();
-
   String? selectedBrand;
   String? selectedCity;
   List<String> selectedBrands = [];
+  List<String> selectedCities = [];
 
   final FocusNode nameFocus = FocusNode();
   final FocusNode phoneFocus = FocusNode();
@@ -37,53 +25,17 @@ class _ShowroomFormState extends State<ShowroomForm> {
 
   @override
   void dispose() {
-    nameController.dispose();
-    phoneController.dispose();
-    locationController.dispose();
     nameFocus.dispose();
     phoneFocus.dispose();
     locationFocus.dispose();
     super.dispose();
   }
 
-  void onSubmit() {
-    final name = nameController.text.trim();
-    final phone = phoneController.text.trim();
-    final location = locationController.text.trim();
-
-    if (name.isEmpty ||
-        phone.isEmpty ||
-        location.isEmpty ||
-        selectedCity == null ||
-        selectedBrand == null ||
-        selectedBrands.isEmpty) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text("يرجى تعبئة جميع الحقول")));
-      return;
-    }
-
-    widget.onSubmit(
-      name,
-      phone,
-      selectedCity!,
-      selectedBrands,
-      selectedBrand!,
-      location,
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
-    const double BorderWidth = 1.0;
-    const double FocusedBorderWidth = 1.5;
-    final Color BorderColor = AppColors.grey;
-    final Color FocusedBorderColor = AppColors.black;
-
     return Column(
       children: [
         AppTextField(
-          controller: nameController,
           hintText: 'أدخل اسم المعرض',
           labelText: 'اسم المعرض',
           keyboardType: TextInputType.name,
@@ -93,8 +45,8 @@ class _ShowroomFormState extends State<ShowroomForm> {
             FocusScope.of(context).requestFocus(phoneFocus);
           },
         ),
+
         AppTextField(
-          controller: phoneController,
           hintText: '05XXXXXXXX',
           labelText: 'رقم التواصل',
           keyboardType: TextInputType.phone,
@@ -104,9 +56,10 @@ class _ShowroomFormState extends State<ShowroomForm> {
             FocusScope.of(context).requestFocus(locationFocus);
           },
         ),
+
         AppDropdownField(
           hintText: 'اختر المدينة',
-          items: const [
+          items: [
             'الرياض',
             'مكة المكرمة',
             'المدينة المنورة',
@@ -123,16 +76,15 @@ class _ShowroomFormState extends State<ShowroomForm> {
           ],
           value: selectedCity,
           onChanged: (val) {
-            setState(() => selectedCity = val);
+            setState(() {
+              selectedCity = val;
+            });
           },
-          borderColor: BorderColor,
-          focusedBorderColor: FocusedBorderColor,
-          borderWidth: BorderWidth,
-          focusedBorderWidth: FocusedBorderWidth,
         ),
+
         MultiSelect(
           hintText: 'اختر العلامات التجارية المتاحة',
-          items: const [
+          items: [
             'MG',
             'Jeep',
             'Jetour',
@@ -159,11 +111,16 @@ class _ShowroomFormState extends State<ShowroomForm> {
             'Kia',
           ],
           selectedValues: selectedBrands,
-          onConfirm: (values) => setState(() => selectedBrands = values),
+          onConfirm: (values) {
+            setState(() {
+              selectedBrands = values;
+            });
+          },
         ),
+
         AppDropdownField(
           hintText: 'اختر العلامة التجارية المميزة',
-          items: const [
+          items: [
             'MG',
             'Jeep',
             'Jetour',
@@ -190,23 +147,30 @@ class _ShowroomFormState extends State<ShowroomForm> {
             'Kia',
           ],
           value: selectedBrand,
-          onChanged: (val) => setState(() => selectedBrand = val),
-          borderColor: BorderColor,
-          focusedBorderColor: FocusedBorderColor,
-          borderWidth: BorderWidth,
-          focusedBorderWidth: FocusedBorderWidth,
+          onChanged: (val) {
+            setState(() {
+              selectedBrand = val;
+            });
+          },
         ),
+
         AppTextField(
-          controller: locationController,
           hintText: 'أدخل رابط الموقع الجغرافي',
           labelText: 'الموقع الجغرافي',
           keyboardType: TextInputType.text,
           focusNode: locationFocus,
           textInputAction: TextInputAction.done,
-          onFieldSubmitted: (_) => locationFocus.unfocus(),
+          onFieldSubmitted: (_) {
+            locationFocus.unfocus();
+          },
         ),
-        const SizedBox(height: 16),
-        AppButton(title: 'إضافة', onPressed: onSubmit),
+
+        AppButton(
+          title: "التالي",
+          onPressed: () {
+            context.pushNamed(Routes.showroomList);
+          },
+        ),
       ],
     );
   }
