@@ -7,6 +7,8 @@ import 'package:sayer/sayer_showroom.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
+
+  ///
   await NotificationHelper.initialize();
   runApp(SayerShowroom(appRouter: AppRouter()));
 }
