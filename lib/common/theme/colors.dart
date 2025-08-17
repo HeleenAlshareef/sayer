@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class AppColors {
   // App theme colors
   static const Color primary = Color(0xFF0362de);
-  static const Color secondary = Color(0x0f031c9e);
+  static const Color secondary = Color(0xF031C9E);
   static const Color accent = Color(0xFF83E3F9);
 
   // Text colors
@@ -15,7 +15,7 @@ class AppColors {
 
   // Background colors
   static const Color light = Color(0xFFF6F6F6);
-  static const Color xlight = Color(0x00e9dddd);
+  static const Color xlight = Color(0xE9DDDD);
   static const Color dark = Color(0xFF272727);
   static const Color primaryBackground = Color(0xFFF3F5FF);
 

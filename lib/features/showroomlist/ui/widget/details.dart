@@ -1,58 +1,59 @@
 class Showroom {
   final String name;
   final String logoPath;
-  final String city;
-  final String brand;
-  final String featuredBrand;
-  final String phone;
+  final String description;
 
   Showroom({
     required this.name,
     required this.logoPath,
-    required this.city,
-    required this.brand,
-    required this.featuredBrand,
-    required this.phone,
+    required this.description,
   });
-
-  String get description =>
-      'اسم المعرض: $name\n'
-      'العلامة التجارية المميزة: $featuredBrand\n'
-      'رقم التواصل: $phone\n'
-      'المدينة: $city';
 }
 
 final List<Showroom> showroomList = [
   Showroom(
-    name: 'عبد اللطيف جميل',
-    logoPath: 'assets/showrooms/5.png',
-    city: 'جدة',
-    brand: 'تويوتا',
-    featuredBrand: 'تويوتا',
-    phone: '920002727',
+    name: 'CHERY',
+    logoPath: 'assets/showrooms/chery.PNG',
+    description: 'شركة شيري',
   ),
   Showroom(
-    name: 'الناغي',
-    logoPath: 'assets/showrooms/3.png',
-    city: 'الرياض',
-    brand: 'هيونداي',
-    featuredBrand: 'هيونداي',
-    phone: '920015599',
+    name: 'Jeep',
+    logoPath: 'assets/showrooms/jeep.PNG',
+    description: 'شركة جيب',
   ),
   Showroom(
-    name: 'الجميح',
-    logoPath: 'assets/showrooms/4.png',
-    city: 'الدمام',
-    brand: 'شفروليه',
-    featuredBrand: 'شفروليه',
-    phone: '8002442244',
+    name: 'HYUNDAI',
+    logoPath: 'assets/showrooms/hyundai.PNG',
+    description: 'شركة هونداي',
   ),
   Showroom(
-    name: 'المجدوعي',
-    logoPath: 'assets/showrooms/2.png',
-    city: 'الخبر',
-    brand: 'شانجان',
-    featuredBrand: 'شانجان',
-    phone: '920015999',
+    name: 'CHEVROLET',
+    logoPath: 'assets/showrooms/chevrolet.PNG',
+    description: 'شركة شفروليه',
+  ),
+  Showroom(
+    name: 'KIA',
+    logoPath: 'assets/showrooms/kia.PNG',
+    description: 'شركة كيا',
+  ),
+  Showroom(
+    name: 'MGC',
+    logoPath: 'assets/showrooms/gmc.PNG',
+    description: 'شركة جي ام سي',
+  ),
+  Showroom(
+    name: 'FORD',
+    logoPath: 'assets/showrooms/ford.PNG',
+    description: 'شركة فورد',
+  ),
+  Showroom(
+    name: 'LEXUS',
+    logoPath: 'assets/showrooms/lexus.PNG',
+    description: 'شركة ليكزس',
+  ),
+  Showroom(
+    name: 'TOYOTA',
+    logoPath: 'assets/showrooms/toyota.PNG',
+    description: 'شركة تيوتا',
   ),
 ];
