@@ -10,18 +10,9 @@ class AppTextField extends StatelessWidget {
   final bool obscureText;
   final FocusNode? focusNode;
   final void Function(String)? onFieldSubmitted;
-  final TextInputAction textInputAction;
-
-  final Color? labelColor;
-  final Color? focusedLabelColor;
-  final Color? textColor;
-  final Color? hintColor;
-  final Color? borderColor;
-  final Color? focusedBorderColor;
-  final Color? fillColor;
 
   const AppTextField({
-    super.key,
+    Key? key,
     required this.hintText,
     this.labelText,
     this.keyboardType = TextInputType.text,
@@ -29,27 +20,11 @@ class AppTextField extends StatelessWidget {
     this.obscureText = false,
     this.focusNode,
     this.onFieldSubmitted,
-    required this.textInputAction,
-    this.labelColor,
-    this.focusedLabelColor,
-    this.textColor,
-    this.hintColor,
-    this.borderColor,
-    this.focusedBorderColor,
-    this.fillColor,
-  });
+    required TextInputAction textInputAction,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final Color effectiveTextColor = textColor ?? AppColors.darkerGrey;
-    final Color effectiveLabelColor = labelColor ?? AppColors.black;
-    final Color effectiveFocusedLabelColor =
-        focusedLabelColor ?? AppColors.black;
-    final Color effectiveHintColor = hintColor ?? AppColors.darkerGrey;
-    final Color effectiveBorderColor = borderColor ?? AppColors.grey;
-    final Color effectiveFocusedBorderColor =
-        focusedBorderColor ?? AppColors.black;
-
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 32, vertical: 6),
       child: SizedBox(
@@ -61,31 +36,22 @@ class AppTextField extends StatelessWidget {
           obscureText: obscureText,
           focusNode: focusNode,
           onFieldSubmitted: onFieldSubmitted,
-          textInputAction: textInputAction,
-          style: TextStyle(fontSize: 12.sp, color: effectiveTextColor),
+          style: TextStyle(fontSize: 12.sp, color: AppColors.darkerGrey),
           decoration: InputDecoration(
             labelText: labelText,
-            labelStyle: TextStyle(color: effectiveLabelColor, fontSize: 14.sp),
-            floatingLabelStyle: TextStyle(
-              color: effectiveFocusedLabelColor,
-              fontSize: 14.sp,
-            ),
             hintText: hintText,
-            hintStyle: TextStyle(fontSize: 10.sp, color: effectiveHintColor),
             contentPadding: EdgeInsets.all(16),
-            filled: fillColor != null,
-            fillColor: fillColor,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10.r),
-              borderSide: BorderSide(color: effectiveBorderColor),
+              borderSide: const BorderSide(color: Colors.grey),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10.r),
-              borderSide: BorderSide(color: effectiveBorderColor),
+              borderSide: BorderSide(color: AppColors.black),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10.r),
-              borderSide: BorderSide(color: effectiveFocusedBorderColor),
+              borderSide: BorderSide(color: AppColors.darkerGrey),
             ),
           ),
         ),
