@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:sayer/common/routing/routes.dart';
-import 'common/routing/app_router.dart.dart';
+import 'common/routing/app_router.dart';
 
 class SayerShowroom extends StatelessWidget {
   final AppRouter appRouter;
@@ -24,6 +24,14 @@ class SayerShowroom extends StatelessWidget {
           GlobalWidgetsLocalizations.delegate,
         ],
         locale: Locale('ar'),
+        localeResolutionCallback: (locale, supportedLocales) {
+          for (var supportedLocale in supportedLocales) {
+            if (supportedLocale.languageCode == locale?.languageCode) {
+              return supportedLocale;
+            }
+          }
+          return supportedLocales.first;
+        },
       ),
     );
   }
