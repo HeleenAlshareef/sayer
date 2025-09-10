@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:sayer/common/helpers/ios_widget.dart';
 import 'package:sayer/common/theme/colors.dart';
 import 'package:sayer/common/widgets/app_bar.dart';
-import 'package:sayer/common/routing/routes.dart';
 import 'package:sayer/features/showroom/ui/widget/showroom_form.dart';
 import 'package:sayer/common/helpers/bar.dart';
-import 'package:sayer/features/showroomlist/ui/widget/details.dart';
 
 class ShowroomScreen extends StatefulWidget {
   const ShowroomScreen({super.key});
@@ -16,6 +15,12 @@ class ShowroomScreen extends StatefulWidget {
 
 class ShowroomScreenState extends State<ShowroomScreen> {
   final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
+
+  @override
+  void initState() {
+    super.initState();
+    fetchAndSendOrderStats();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -57,33 +62,7 @@ class ShowroomScreenState extends State<ShowroomScreen> {
                     ),
                   ),
                   SizedBox(height: 40.h),
-                  ShowroomForm(
-                    onSubmit: (name, phone, city, brands, featured, location) {
-                      if (name.isEmpty ||
-                          phone.isEmpty ||
-                          city.isEmpty ||
-                          brands.isEmpty ||
-                          featured.isEmpty ||
-                          location.isEmpty) {
-                        return;
-                      }
-
-                      showroomList.add(
-                        Showroom(
-                          name: name,
-                          phone: phone,
-                          city: city,
-                          brand: brands.join(', '),
-                          featuredBrand: featured,
-                          logoPath: '',
-                          availableBrands: brands,
-                          location: location,
-                        ),
-                      );
-
-                      Navigator.pushNamed(context, Routes.showroomList);
-                    },
-                  ),
+                  const ShowroomForm(),
                 ],
               ),
             ),

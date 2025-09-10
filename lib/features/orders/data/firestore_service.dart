@@ -1,12 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:sayer/common/helpers/notification.dart';
 import 'package:sayer/features/orders/models/order_model.dart';
 
 class FirestoreService {
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FirebaseFirestore firestore = FirebaseFirestore.instance;
+  final Set<String> notifiedPhones = {};
 
-  Stream<List<OrderModel>> listenToOrders() {
-    return _firestore.collection('SuggestionCars').snapshots().asyncMap((
+  Stream<List<OrderModel>> listenToOrders({String? statusFilter}) {
+    return firestore.collection('SuggestionCars').snapshots().asyncMap((
       snapshot,
     ) async {
       List<OrderModel> allOrders = [];
@@ -18,22 +18,53 @@ class FirestoreService {
         final name = data['UserName'] ?? 'اسم غير معروف';
         final from = data['formWhere'] ?? 'مصدر غير معروف';
 
-        allOrders.add(
-          OrderModel(
-            phone: phone,
-            message: message,
-            name: name,
-            formWhere: from,
-          ),
-        );
+        final timestamp = (data['timestamp'] as Timestamp?)?.toDate();
 
-        NotificationHelper.showNotification(
-          "طلب جديد من $name",
-          message.isNotEmpty ? message : "بدون رسالة",
-        );
+        String status = 'جديد';
+        try {
+          final stateDoc =
+              await firestore.collection('OrderStates').doc(phone).get();
+          if (stateDoc.exists) {
+            status = stateDoc.data()?['status'] ?? 'جديد';
+          }
+        } catch (e) {}
+
+        if (statusFilter == null || status == statusFilter) {
+          allOrders.add(
+            OrderModel(
+              phone: phone,
+              message: message,
+              name: name,
+              formWhere: from,
+              status: status,
+              timestamp: timestamp,
+            ),
+          );
+
+          // إشعار الطلب الجديد
+          /*
+          if (status == 'جديد' && !notifiedPhones.contains(phone)) {
+            NotificationHelper.showNotification(
+              "طلب جديد من $name",
+              message.isNotEmpty ? message : "بدون رسالة",
+            );
+            notifiedPhones.add(phone);
+          }
+          */
+        }
       }
 
       return allOrders;
     });
+  }
+
+  Future<void> updateOrderStatus(String phone, String newStatus) async {
+    try {
+      await firestore.collection('OrderStates').doc(phone).set({
+        'status': newStatus,
+      }, SetOptions(merge: true));
+    } catch (e) {
+      print('فشل تحديث الحالة: $e');
+    }
   }
 }

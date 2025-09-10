@@ -7,6 +7,8 @@ import 'package:sayer/features/orders/ui/widget/filter.dart';
 import 'package:sayer/common/widgets/app_bar.dart';
 import 'package:sayer/common/helpers/bar.dart';
 import 'package:sayer/features/orders/ui/widget/orders_list.dart';
+import 'package:sayer/features/orders/models/order_model.dart';
+import 'dart:async';
 
 class OrdersScreen extends StatefulWidget {
   const OrdersScreen({super.key});
@@ -17,52 +19,62 @@ class OrdersScreen extends StatefulWidget {
 
 class OrdersScreenState extends State<OrdersScreen> {
   String? selectedFrom;
-  List<Map<String, dynamic>> allOrders = [];
+  String? selectedStatus;
+
+  List<OrderModel> allOrders = [];
   final FirestoreService firestoreService = FirestoreService();
+
+  StreamSubscription<List<OrderModel>>? ordersSubscription;
 
   @override
   void initState() {
     super.initState();
     NotificationHelper.initialize();
-    listenToOrdersStream();
+    _listenToFilteredOrders();
   }
 
-  void listenToOrdersStream() {
-    firestoreService.listenToOrders().listen((orders) {
-      final data =
-          orders.map((order) {
-            return {
-              'name': order.name,
-              'phone': order.phone,
-              'message': order.message,
-              'from': order.formWhere,
-            };
-          }).toList();
-
-      if (data.length > allOrders.length) {
-        NotificationHelper.showNotification(
-          'طلب جديد',
-          'تم استلام طلب جديد من ${data.last['name']}',
-        );
-      }
-
+  void _listenToFilteredOrders() {
+    ordersSubscription?.cancel();
+    ordersSubscription = firestoreService.listenToOrders().listen((orders) {
+      if (!mounted) return;
       setState(() {
-        allOrders = data;
+        allOrders = orders;
       });
     });
+  }
+
+  void onStatusChanged(String? value) {
+    setState(() {
+      selectedStatus = value;
+    });
+  }
+
+  void onFromChanged(String? value) {
+    setState(() {
+      selectedFrom = value;
+    });
+  }
+
+  @override
+  void dispose() {
+    ordersSubscription?.cancel();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     final fromList = <String?>[
-      null,
-      ...{...allOrders.map((e) => e['from']).whereType<String>()},
+      ...{...allOrders.map((e) => e.formWhere).whereType<String>()},
     ];
+    final statusList = <String?>['جديد', 'جارٍ التواصل', 'تم الإغلاق'];
 
     final filtered =
-        allOrders.where((o) {
-          final fromMatches = selectedFrom == null || o['from'] == selectedFrom;
-          return fromMatches;
+        allOrders.where((order) {
+          final matchesFrom =
+              selectedFrom == null || order.formWhere == selectedFrom;
+          final matchesStatus =
+              selectedStatus == null || order.status == selectedStatus;
+          return matchesFrom && matchesStatus;
         }).toList();
 
     return Stack(
@@ -106,20 +118,20 @@ class OrdersScreenState extends State<OrdersScreen> {
                     ],
                   ),
                   SizedBox(height: 20.h),
-
                   FilterWidget(
                     fromList: fromList,
+                    statusList: statusList,
                     selectedFrom: selectedFrom,
-                    onFromChanged: (v) => setState(() => selectedFrom = v),
-                    borderColor: Colors.black26,
+                    selectedStatus: selectedStatus,
+                    onFromChanged: onFromChanged,
+                    onStatusChanged: onStatusChanged,
+                    borderColor: AppColors.black,
                     focusedBorderColor: AppColors.buttonPrimary,
-                    dropdownBackgroundColor: Colors.white,
+                    dropdownBackgroundColor: AppColors.white,
                     hintColor: AppColors.darkerGrey,
                     textColor: AppColors.black,
                   ),
-
                   SizedBox(height: 16.h),
-
                   if (filtered.isEmpty)
                     Padding(
                       padding: EdgeInsets.symmetric(vertical: 40.h),
@@ -132,15 +144,7 @@ class OrdersScreenState extends State<OrdersScreen> {
                       ),
                     )
                   else
-                    OrdersList(
-                      orders:
-                          filtered
-                              .map(
-                                (e) =>
-                                    e.map((k, v) => MapEntry(k, v.toString())),
-                              )
-                              .toList(),
-                    ),
+                    OrdersList(orders: filtered),
                 ],
               ),
             ),

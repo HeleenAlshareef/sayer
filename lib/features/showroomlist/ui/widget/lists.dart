@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:sayer/common/theme/colors.dart';
-import 'details.dart';
+import 'package:sayer/features/showroomlist/model/showrooms_list_model.dart';
+import 'package:sayer/features/showroomlist/ui/widget/showrooms_menu.dart';
 
 class ShowroomGrid extends StatelessWidget {
   final String? city;
@@ -21,43 +23,63 @@ class ShowroomGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final String searchTerm = (query ?? '').trim();
+    return StreamBuilder<QuerySnapshot>(
+      stream: FirebaseFirestore.instance.collection('ShowroomsOP').snapshots(),
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) {
+          return const Center(child: CircularProgressIndicator());
+        }
 
-    final List filteredShowrooms =
-        showroomList.where((s) {
-          final matchesFilters =
-              (city == null || s.city == city) &&
-              (brand == null || s.brand == brand) &&
-              (featuredBrand == null || s.featuredBrand == featuredBrand);
+        final List<ShowroomsListModel> showrooms =
+            snapshot.data!.docs
+                .map(
+                  (doc) => ShowroomsListModel.fromMap(
+                    doc.data() as Map<String, dynamic>,
+                    doc.id,
+                  ),
+                )
+                .where((s) {
+                  final matchesFilters =
+                      (city == null || s.city == city) &&
+                      (featuredBrand == null ||
+                          s.featuredBrand == featuredBrand);
 
-          final matchesSearch =
-              searchTerm.isEmpty ||
-              [
-                s.name,
-                s.city,
-                s.brand,
-                s.featuredBrand,
-              ].any((t) => t.toString().contains(searchTerm));
+                  final searchTerm = (query ?? '').toLowerCase();
+                  final matchesSearch =
+                      searchTerm.isEmpty ||
+                      s.name.toLowerCase().contains(searchTerm) ||
+                      s.city.toLowerCase().contains(searchTerm) ||
+                      s.featuredBrand.toLowerCase().contains(searchTerm);
 
-          return matchesFilters && matchesSearch;
-        }).toList();
+                  return matchesFilters && matchesSearch;
+                })
+                .toList();
 
-    return GridView.builder(
-      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
-      physics: const BouncingScrollPhysics(),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        childAspectRatio: 0.82,
-        crossAxisSpacing: 12,
-        mainAxisSpacing: 12,
-      ),
-      itemCount: filteredShowrooms.length,
-      itemBuilder: (context, index) {
-        final showroom = filteredShowrooms[index];
+        return GridView.builder(
+          padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
+          physics: const BouncingScrollPhysics(),
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+            childAspectRatio: 0.82,
+            crossAxisSpacing: 12,
+            mainAxisSpacing: 12,
+          ),
+          itemCount: showrooms.length,
+          itemBuilder: (context, index) {
+            final showroom = showrooms[index];
+            return buildTile(context, showroom);
+          },
+        );
+      },
+    );
+  }
 
-        return GestureDetector(
-          onTap: () => showShowroomDetailsDialog(context, showroom),
-          child: Column(
+  Widget buildTile(BuildContext context, ShowroomsListModel showroom) {
+    return GestureDetector(
+      onTap: () => showDetailsDialog(context, showroom),
+      child: Stack(
+        children: [
+          Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Expanded(
@@ -85,19 +107,11 @@ class ShowroomGrid extends StatelessWidget {
                       ],
                     ),
                     child: Center(
-                      child: Padding(
-                        padding: EdgeInsets.all(12.w),
-                        child:
-                            showroom.logoPath.isNotEmpty
-                                ? Image.asset(
-                                  showroom.logoPath,
-                                  fit: BoxFit.contain,
-                                )
-                                : Icon(
-                                  Icons.store,
-                                  size: 48,
-                                  color: AppColors.primary,
-                                ),
+                      child: Image.asset(
+                        'assets/images/NewShowroom.png',
+                        width: 80,
+                        height: 80,
+                        fit: BoxFit.contain,
                       ),
                     ),
                   ),
@@ -117,12 +131,17 @@ class ShowroomGrid extends StatelessWidget {
               ),
             ],
           ),
-        );
-      },
+          Positioned(
+            top: 4,
+            right: 4,
+            child: ShowroomMenu(showroomId: showroom.id),
+          ),
+        ],
+      ),
     );
   }
 
-  void showShowroomDetailsDialog(BuildContext context, dynamic showroom) {
+  void showDetailsDialog(BuildContext context, ShowroomsListModel showroom) {
     showDialog(
       context: context,
       builder:
@@ -132,13 +151,6 @@ class ShowroomGrid extends StatelessWidget {
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(24.r),
               ),
-              insetPadding: EdgeInsets.symmetric(
-                horizontal: 24.w,
-                vertical: 24.h,
-              ),
-              titlePadding: EdgeInsets.fromLTRB(24.w, 24.h, 24.w, 0),
-              contentPadding: EdgeInsets.fromLTRB(24.w, 16.h, 24.w, 8.h),
-              actionsPadding: EdgeInsets.fromLTRB(16.w, 0, 16.w, 12.h),
               backgroundColor: AppColors.white,
               title: Text(
                 showroom.name,
@@ -152,35 +164,29 @@ class ShowroomGrid extends StatelessWidget {
               content: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Center(
-                    child:
-                        showroom.logoPath.isNotEmpty
-                            ? Image.asset(showroom.logoPath, height: 80.h)
-                            : Icon(
-                              Icons.store,
-                              size: 48,
-                              color: AppColors.primary,
-                            ),
+                  Image.asset(
+                    'assets/images/NewShowroom1.png',
+                    width: 60,
+                    height: 60,
+                    fit: BoxFit.contain,
                   ),
                   SizedBox(height: 16.h),
+                  buildInfoRow(context, 'المدينة', showroom.city),
                   buildInfoRow(
                     context,
-                    'العلامات التجارية المتاحة',
-                    showroom.availableBrands.join(', '),
-                  ),
-                  buildInfoRow(context, 'الموقع الجغرافي', showroom.location),
-                  buildInfoRow(context, 'اسم المعرض', showroom.name),
-                  buildInfoRow(
-                    context,
-                    'العلامة التجارية المميزة',
+                    'العلامة المميزة',
                     showroom.featuredBrand,
                   ),
-                  if ((showroom.phone ?? '').toString().isNotEmpty)
+                  buildInfoRow(context, 'الموقع', showroom.location),
+                  if ((showroom.phone ?? '').trim().isNotEmpty)
                     buildInfoRow(context, 'رقم التواصل', showroom.phone),
-                  buildInfoRow(context, 'المدينة', showroom.city),
+                  buildInfoRow(
+                    context,
+                    'العلامات المتاحة',
+                    showroom.availableBrands.join('، '),
+                  ),
                 ],
               ),
-              actionsAlignment: MainAxisAlignment.start,
               actions: [
                 TextButton(
                   onPressed: () => Navigator.of(context).pop(),
@@ -196,7 +202,7 @@ class ShowroomGrid extends StatelessWidget {
   }
 
   Widget buildInfoRow(BuildContext context, String label, dynamic value) {
-    final String textValue = (value ?? '').toString().trim();
+    final textValue = (value ?? '').toString().trim();
     return Padding(
       padding: EdgeInsets.only(bottom: 8.h),
       child: RichText(

@@ -1,36 +1,22 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'dart:io';
+import 'package:firebase_messaging/firebase_messaging.dart';
 
 class NotificationHelper {
-  static final notifications = FlutterLocalNotificationsPlugin();
-
   static Future<void> initialize() async {
-    try {
-      const DarwinInitializationSettings iosInit = DarwinInitializationSettings(
-        requestAlertPermission: true,
-        requestBadgePermission: true,
-        requestSoundPermission: true,
-      );
-
-      const InitializationSettings initSettings = InitializationSettings(
-        iOS: iosInit,
-      );
-
-      final bool? initialized = await notifications.initialize(initSettings);
-      debugPrint('Notifications initialized: $initialized');
-    } catch (e) {
-      debugPrint('Error initializing notifications: $e');
-      rethrow;
+    if (Platform.isIOS) {
+      await FirebaseMessaging.instance.requestPermission();
     }
+
+    //FirebaseMessaging.onMessage.listen((message) {});
+    //FirebaseMessaging.onMessageOpenedApp.listen((message) {});
   }
 
-  static Future<void> showNotification(String title, String body) async {
-    const DarwinNotificationDetails iosDetails = DarwinNotificationDetails();
-
-    const NotificationDetails platformDetails = NotificationDetails(
-      iOS: iosDetails,
-    );
-
-    await notifications.show(0, title, body, platformDetails);
+  static Future<void> printFCMToken() async {
+    try {
+      final token = await FirebaseMessaging.instance.getToken();
+      if (token != null) {
+        print(token);
+      }
+    } catch (_) {}
   }
 }

@@ -17,6 +17,9 @@ Future<void> main() async {
     // Initialize notifications
     await NotificationHelper.initialize();
 
+    // Print FCM token to debug console (only the token)
+    await NotificationHelper.printFCMToken();
+
     // Run the app
     runApp(SayerShowroom(appRouter: AppRouter()));
   } catch (e) {

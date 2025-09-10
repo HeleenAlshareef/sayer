@@ -3,11 +3,15 @@ class OrderModel {
   final String message;
   final String name;
   final String formWhere;
+  String status;
+  final DateTime? timestamp;
 
   OrderModel({
     required this.phone,
     required this.message,
     required this.name,
     required this.formWhere,
+    required this.status,
+    this.timestamp,
   });
 }

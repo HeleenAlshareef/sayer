@@ -20,6 +20,8 @@ class AppTextField extends StatelessWidget {
   final Color? focusedBorderColor;
   final Color? fillColor;
 
+  final String? Function(String?)? validator;
+
   const AppTextField({
     super.key,
     required this.hintText,
@@ -37,6 +39,7 @@ class AppTextField extends StatelessWidget {
     this.borderColor,
     this.focusedBorderColor,
     this.fillColor,
+    this.validator,
   });
 
   @override
@@ -62,13 +65,49 @@ class AppTextField extends StatelessWidget {
           focusNode: focusNode,
           onFieldSubmitted: onFieldSubmitted,
           textInputAction: textInputAction,
-          style: TextStyle(fontSize: 12.sp, color: effectiveTextColor),
+          validator: validator,
+          style: TextStyle(
+            fontSize: 12.sp,
+            color: effectiveTextColor,
+            fontFamily: Theme.of(context).textTheme.bodyMedium?.fontFamily,
+          ),
           decoration: InputDecoration(
-            labelText: labelText,
-            labelStyle: TextStyle(color: effectiveLabelColor, fontSize: 14.sp),
+            label:
+                labelText != null
+                    ? RichText(
+                      text: TextSpan(
+                        text: labelText!.replaceAll('*', ''),
+                        style: TextStyle(
+                          color: effectiveLabelColor,
+                          fontSize: 12.sp,
+                          fontFamily:
+                              Theme.of(
+                                context,
+                              ).textTheme.bodyMedium?.fontFamily,
+                        ),
+                        children:
+                            labelText!.contains('*')
+                                ? [
+                                  TextSpan(
+                                    text: ' *',
+                                    style: TextStyle(
+                                      color: Colors.red,
+                                      fontSize: 14.sp,
+                                      fontFamily:
+                                          Theme.of(
+                                            context,
+                                          ).textTheme.bodyMedium?.fontFamily,
+                                    ),
+                                  ),
+                                ]
+                                : [],
+                      ),
+                    )
+                    : null,
             floatingLabelStyle: TextStyle(
               color: effectiveFocusedLabelColor,
-              fontSize: 14.sp,
+              fontSize: 10.sp,
+              fontFamily: Theme.of(context).textTheme.bodyMedium?.fontFamily,
             ),
             hintText: hintText,
             hintStyle: TextStyle(fontSize: 10.sp, color: effectiveHintColor),
