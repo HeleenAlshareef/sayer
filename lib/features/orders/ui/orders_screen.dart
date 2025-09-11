@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:sayer/common/helpers/notification.dart';
 import 'package:sayer/common/theme/colors.dart';
 import 'package:sayer/features/orders/data/firestore_service.dart';
 import 'package:sayer/features/orders/ui/widget/filter.dart';
@@ -29,7 +28,6 @@ class OrdersScreenState extends State<OrdersScreen> {
   @override
   void initState() {
     super.initState();
-    NotificationHelper.initialize();
     _listenToFilteredOrders();
   }
 
