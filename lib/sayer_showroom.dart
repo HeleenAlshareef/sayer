@@ -6,24 +6,31 @@ import 'common/routing/app_router.dart';
 
 class SayerShowroom extends StatelessWidget {
   final AppRouter appRouter;
-  const SayerShowroom({super.key, required this.appRouter});
+  final GlobalKey<NavigatorState> navigatorKey;
+
+  const SayerShowroom({
+    super.key,
+    required this.appRouter,
+    required this.navigatorKey, 
+  });
 
   @override
   Widget build(BuildContext context) {
     return ScreenUtilInit(
-      designSize: Size(430, 932),
+      designSize: const Size(430, 932),
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
+        navigatorKey: navigatorKey,
         onGenerateRoute: appRouter.generateRoutes,
         initialRoute: Routes.showroom,
         theme: ThemeData(fontFamily: "Montserrat"),
-        supportedLocales: [Locale('ar'), Locale('en')],
-        localizationsDelegates: [
+        supportedLocales: const [Locale('ar'), Locale('en')],
+        localizationsDelegates: const [
           GlobalCupertinoLocalizations.delegate,
           GlobalMaterialLocalizations.delegate,
           GlobalWidgetsLocalizations.delegate,
         ],
-        locale: Locale('ar'),
+        locale: const Locale('ar'),
         localeResolutionCallback: (locale, supportedLocales) {
           for (var supportedLocale in supportedLocales) {
             if (supportedLocale.languageCode == locale?.languageCode) {
