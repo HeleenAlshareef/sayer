@@ -17,15 +17,19 @@ class FirestoreService {
         final message = data['Msg'] ?? '';
         final name = data['UserName'] ?? 'اسم غير معروف';
         final from = data['formWhere'] ?? 'مصدر غير معروف';
-
         final timestamp = (data['timestamp'] as Timestamp?)?.toDate();
 
         String status = 'جديد';
+
         try {
-          final stateDoc =
-              await firestore.collection('OrderStates').doc(phone).get();
-          if (stateDoc.exists) {
-            status = stateDoc.data()?['status'] ?? 'جديد';
+          final stateSnap =
+              await firestore
+                  .collection('OrderStates')
+                  .doc(phone)
+                  .snapshots()
+                  .first;
+          if (stateSnap.exists) {
+            status = stateSnap.data()?['status'] ?? 'جديد';
           }
         } catch (e) {}
 
@@ -40,17 +44,6 @@ class FirestoreService {
               timestamp: timestamp,
             ),
           );
-
-          // إشعار الطلب الجديد
-          /*
-          if (status == 'جديد' && !notifiedPhones.contains(phone)) {
-            NotificationHelper.showNotification(
-              "طلب جديد من $name",
-              message.isNotEmpty ? message : "بدون رسالة",
-            );
-            notifiedPhones.add(phone);
-          }
-          */
         }
       }
 
