@@ -19,25 +19,11 @@ Future<void> main() async {
     // Initialize notifications (with navigatorKey for in-app UI)
     await NotificationHelper.initialize(navigatorKey);
 
-    // Print FCM token to debug console (only the token)
-    await NotificationHelper.printFCMToken();
-
     // Run the app
-    runApp(
-      SayerShowroom(
-        appRouter: AppRouter(),
-        navigatorKey: navigatorKey, 
-      ),
-    );
-    
+    runApp(SayerShowroom(appRouter: AppRouter(), navigatorKey: navigatorKey));
   } catch (e) {
     // In case of initialization error, run app without Firebase
     debugPrint('Firebase initialization error: $e');
-    runApp(
-      SayerShowroom(
-        appRouter: AppRouter(),
-        navigatorKey: navigatorKey,
-      ),
-    );
+    runApp(SayerShowroom(appRouter: AppRouter(), navigatorKey: navigatorKey));
   }
 }
