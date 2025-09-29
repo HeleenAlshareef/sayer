@@ -1,9 +1,11 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:sayer/common/theme/colors.dart';
 import 'package:sayer/features/showroomlist/model/showrooms_list_model.dart';
 import 'package:sayer/features/showroomlist/ui/widget/showrooms_menu.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ShowroomGrid extends StatelessWidget {
   final String? city;
@@ -185,17 +187,19 @@ class ShowroomGrid extends StatelessWidget {
                     'العلامات المتاحة',
                     showroom.availableBrands.join('، '),
                   ),
+                  SizedBox(height: 12.h),
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: TextButton(
+                      onPressed: () => Navigator.of(context).pop(),
+                      child: Text(
+                        'إغلاق',
+                        style: TextStyle(color: AppColors.primary),
+                      ),
+                    ),
+                  ),
                 ],
               ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.of(context).pop(),
-                  child: Text(
-                    'إغلاق',
-                    style: TextStyle(color: AppColors.primary),
-                  ),
-                ),
-              ],
             ),
           ),
     );
@@ -203,6 +207,8 @@ class ShowroomGrid extends StatelessWidget {
 
   Widget buildInfoRow(BuildContext context, String label, dynamic value) {
     final textValue = (value ?? '').toString().trim();
+    final isPhone = label == 'رقم التواصل' && textValue.isNotEmpty;
+
     return Padding(
       padding: EdgeInsets.only(bottom: 8.h),
       child: RichText(
@@ -221,13 +227,31 @@ class ShowroomGrid extends StatelessWidget {
               text: textValue.isEmpty ? '-' : textValue,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                 fontWeight: FontWeight.w400,
-                color: AppColors.black,
+                color: isPhone ? Colors.green : AppColors.black,
                 fontSize: 12.sp,
+                decoration:
+                    isPhone ? TextDecoration.underline : TextDecoration.none,
               ),
+              recognizer:
+                  isPhone
+                      ? (TapGestureRecognizer()
+                        ..onTap = () => openWhatsApp(textValue))
+                      : null,
             ),
           ],
         ),
       ),
     );
+  }
+
+  void openWhatsApp(String phone) async {
+    final cleanedPhone = phone.replaceAll(RegExp(r'\D'), '');
+    final formattedPhone =
+        cleanedPhone.startsWith('966') ? cleanedPhone : '966$cleanedPhone';
+    final uri = Uri.parse('https://wa.me/$formattedPhone');
+
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    }
   }
 }

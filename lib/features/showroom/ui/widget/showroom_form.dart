@@ -63,23 +63,12 @@ class _ShowroomFormState extends State<ShowroomForm> {
 
   Future<void> onSubmit() async {
     if (formKey.currentState!.validate()) {
-      if (!Validation.isDropdownValid(selectedCity) ||
-          !Validation.isDropdownValid(selectedBrand) ||
-          selectedBrands.isEmpty) {
-        context.showNotification(
-          message: "يرجى تعبئة جميع الحقول",
-          icon: Icons.error_outline,
-          iconColor: Colors.red,
-        );
-        return;
-      }
-
       await controller.saveShowroom(
         name: nameController.text.trim(),
         phone: phoneController.text.trim(),
-        city: selectedCity!,
+        city: selectedCity ?? '',
         brands: selectedBrands,
-        featuredBrand: selectedBrand!,
+        featuredBrand: selectedBrand ?? '',
         location: locationController.text.trim(),
       );
       context.showNotification(
@@ -116,7 +105,7 @@ class _ShowroomFormState extends State<ShowroomForm> {
           ),
           AppTextField(
             controller: phoneController,
-            hintText: '05XXXXXXXX',
+            hintText: 'أدخل رقم التواصل',
             labelText: 'رقم التواصل *',
             keyboardType: TextInputType.phone,
             focusNode: phoneFocus,
@@ -217,8 +206,8 @@ class _ShowroomFormState extends State<ShowroomForm> {
           ),
           AppTextField(
             controller: locationController,
-            hintText: 'أدخل رابط الموقع الجغرافي',
-            labelText: 'الموقع الجغرافي (اختياري)',
+            hintText: 'أدخل رابط الموقع الجغرافي)',
+            labelText: 'الموقع الجغرافي',
             keyboardType: TextInputType.text,
             focusNode: locationFocus,
             textInputAction: TextInputAction.done,

@@ -8,19 +8,31 @@ class Validation {
 
   static String? validatePhoneNumber(String? value) {
     if (value == null || value.trim().isEmpty) {
-      return 'رقم الجوال مطلوب';
+      return 'رقم التواصل مطلوب';
     }
-    if (value.length != 10) {
-      return 'رقم الجوال يجب أن يتكون من 10 خانات';
+
+    String phone = value.trim();
+
+    if (phone.endsWith('+') && !phone.startsWith('+')) {
+      phone = '+' + phone.replaceAll('+', '');
     }
-    if (!value.startsWith('05')) {
-      return 'رقم الجوال غير صحيح! يجب أن يبدأ بـ 05';
+
+    // يقبل إذا بدأ بـ 05
+    if (phone.startsWith('05') && RegExp(r'^[0-9]+$').hasMatch(phone)) {
+      return null;
     }
-    final numericRegex = RegExp(r'^[0-9]+$');
-    if (!numericRegex.hasMatch(value)) {
-      return 'رقم الجوال يجب أن يحتوي على أرقام فقط';
+
+    // يقبل إذا بدأ بـ +966
+    if (phone.startsWith('+966') && RegExp(r'^\+966[0-9]+$').hasMatch(phone)) {
+      return null;
     }
-    return null;
+
+    // يقبل إذا بدأ بـ 966
+    if (phone.startsWith('966') && RegExp(r'^966[0-9]+$').hasMatch(phone)) {
+      return null;
+    }
+
+    return 'رقم الجوال غير صحيح! يجب أن يبدأ بـ 05 أو +966';
   }
 
   static bool isDropdownValid(String? value) {
